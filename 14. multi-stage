@@ -1,0 +1,15 @@
+FROM golang:1.13.5-alpine as build
+  
+WORKDIR /app
+
+COPY . .
+
+RUN apk add git && export GOBIN=/app && go get && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app .
+
+FROM alpine:3.10.3
+
+WORKDIR /app
+
+COPY --from=build /app/app /app
+
+ENTRYPOINT ["/app/app"]
